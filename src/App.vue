@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const items = ref([
   {
@@ -39,6 +39,42 @@ const items = ref([
     soldOut: false
   }
 ])
+
+/**
+ * 価格を3桁ごとのカンマ付きで返す
+ * @param {number} price 価格
+ */
+function pricePrefix(price) {
+  return price.toLocaleString()
+}
+
+/**
+ * 在庫のある商品数を返す
+ */
+function stockQuantity() {
+  return items.value.filter(item => item.soldOut === false).length
+}
+
+/**
+ * 商品の在庫状況を変更する
+ * @param {object} 商品情報
+ */
+function stockItem(item) {
+  item.soldOut = false
+}
+
+/**
+ * 現在時刻を取得する
+ */
+function getDate() {
+  return Date.now()
+}
+const getDateComputed = computed(function() {
+  return Date.now()
+})
+const stockQuantityComputed = computed(function () {
+  return items.value.filter(item => item.soldOut === false).length
+})
 </script>
 
 <template>
@@ -48,6 +84,8 @@ const items = ref([
       alt="">
     <h1>Vue.js ハンズオン</h1>
   </header>
+  <div>現在時刻：{{ getDate() }}</div>
+  <div>現在時刻(computed)：{{ getDateComputed }}</div>
   <main class="main">
     <template
       v-for="item in items"
@@ -63,10 +101,12 @@ const items = ref([
         <div class='description'>
           <h2>{{item.name}}</h2>
           <p>{{item.description}}</p>
-          <span>¥<span class='price'>{{item.price}}</span></span>
+          <span>¥<span class='price'>{{pricePrefix(item.price)}}</span></span>
         </div>
       </div>
-      <div v-else>売り切れです</div>
+      <div v-else>
+        売り切れです<button type="button" @click="stockItem(item)">入荷</button>
+      </div>
     </template>
   </main>
 </template>
